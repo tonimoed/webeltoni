@@ -12,6 +12,15 @@
 
 # testing
 /coverage
+/test-results
+/playwright-report
+/.playwright-cli
+/.playwright
+
+# local dev/debug artifacts
+/*.png
+.dev.log
+.dev.err.log
 
 # next.js
 /.next/
