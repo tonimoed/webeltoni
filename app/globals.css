@@ -1,0 +1,101 @@
+@import "tailwindcss";
+
+/* ------------------------------------------------------------------ */
+/* Design tokens (see build spec §4). Tailwind v4 is CSS-first, so      */
+/* tokens live here in @theme rather than in tailwind.config.ts.        */
+/* ------------------------------------------------------------------ */
+@theme {
+  --color-cream: #f3ece0;
+  --color-ink: #1a1310;
+  --color-red: #a4161a;
+  --color-red-hover: #c81e2d;
+  --color-red-deep: #6e0d10;
+  --color-amber: #e8a33d;
+  --color-muted: #8a7e70;
+  --color-white: #ffffff;
+
+  --font-display: var(--font-anton);
+  --font-body: var(--font-inter);
+
+  /* fluid type scale */
+  --text-hero: clamp(4rem, 22vw, 20rem);
+  --text-h2: clamp(2rem, 6vw, 4.5rem);
+
+  --radius-2xl: 1.25rem;
+}
+
+:root {
+  --background: var(--color-cream);
+  --foreground: var(--color-ink);
+}
+
+html {
+  scroll-behavior: smooth;
+  background: var(--color-ink);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-body), system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Oversized condensed display type for the artist name / headlines */
+.font-display {
+  font-family: var(--font-display), "Arial Narrow", sans-serif;
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+  line-height: 0.86;
+}
+
+/* Visible focus ring for keyboard users (a11y) */
+:focus-visible {
+  outline: 3px solid var(--color-amber);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+/* Warm film-grain + vignette overlay utility */
+.grain-overlay {
+  pointer-events: none;
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  mix-blend-mode: multiply;
+  opacity: 0.06;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* Reveal-on-scroll primitives (IntersectionObserver toggles .is-visible) */
+.reveal {
+  opacity: 0;
+  transform: translateY(28px) scale(0.985);
+  transition:
+    opacity 0.6s ease-out,
+    transform 0.6s ease-out;
+  will-change: opacity, transform;
+}
+.reveal.is-visible {
+  opacity: 1;
+  transform: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
+
+::selection {
+  background: var(--color-red);
+  color: var(--color-cream);
+}
