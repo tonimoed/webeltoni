@@ -20,6 +20,9 @@ export function Social() {
         <h2 className="font-display text-h2 leading-none text-red-deep">
           Conecta
         </h2>
+        <p className="mx-auto mt-3 max-w-md text-muted">
+          Detrás de cámaras, letras y lo que viene. Sígueme donde más te muevas.
+        </p>
         <ul className="mt-8 flex flex-wrap justify-center gap-3">
           {visible.map((s) => (
             <li key={s.key}>

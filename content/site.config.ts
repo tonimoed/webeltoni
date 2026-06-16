@@ -34,8 +34,8 @@ export const site = {
     youtube: "https://www.youtube.com/@eltonihidalgo",
     spotify: "https://open.spotify.com/artist/7s116O3u1tP0IaPaRWhDcH",
     appleMusic: "https://music.apple.com/es/artist/el-toni/1841115561",
-    instagram: "", // [INSTAGRAM_URL] optional
-    tiktok: "", // [TIKTOK_URL] optional
+    instagram: "https://www.instagram.com/eltonihidalgo/",
+    tiktok: "https://www.tiktok.com/@eltonihidalgo",
   },
 
   latest: {
