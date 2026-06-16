@@ -32,6 +32,17 @@
 html {
   scroll-behavior: smooth;
   background: var(--color-ink);
+  /* offset anchor jumps so the sticky nav doesn't cover section tops */
+  scroll-padding-top: 5rem;
+}
+
+/* balanced headings, pretty body wrapping */
+h1,
+h2 {
+  text-wrap: balance;
+}
+p {
+  text-wrap: pretty;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -98,4 +109,15 @@ body {
 ::selection {
   background: var(--color-red);
   color: var(--color-cream);
+}
+
+/* snappier taps on touch devices */
+button,
+a,
+[role="button"],
+input,
+select,
+textarea {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }

@@ -31,7 +31,14 @@ export function About() {
             Sobre mí
           </h2>
           <p className="mt-6 text-lg leading-relaxed">{site.about}</p>
-          <div className="mt-8">
+          <Image
+            src="/assets/brand/signature-ink.png"
+            alt="Firma de EL TONI"
+            width={220}
+            height={120}
+            className="mt-6 h-auto w-44 opacity-90"
+          />
+          <div className="mt-6">
             <LinkButton href="#escuchar" variant="secondary">
               Escuchar mi música
             </LinkButton>

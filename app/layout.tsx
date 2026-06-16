@@ -81,6 +81,11 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="es" className={`${anton.variable} ${inter.variable}`}>
+      <head>
+        {/* warm up the Spotify embed origins (loaded lazily, click-to-play) */}
+        <link rel="preconnect" href="https://open.spotify.com" />
+        <link rel="preconnect" href="https://i.scdn.co" crossOrigin="" />
+      </head>
       <body className="min-h-screen bg-cream">
         <a
           href="#inicio"

@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { site } from "@/content/site.config";
 import { track } from "@/lib/analytics";
@@ -17,10 +18,16 @@ export function Footer() {
     <footer className="bg-ink py-12 text-cream/80">
       <div className="mx-auto flex max-w-[1280px] flex-col gap-8 px-5 md:flex-row md:items-center md:justify-between">
         <div>
-          <Link href="#inicio" className="font-display text-3xl text-cream">
-            {site.artist}
+          <Link href="#inicio" aria-label="EL TONI — inicio" className="inline-block">
+            <Image
+              src="/assets/brand/signature-cream.png"
+              alt="Firma de EL TONI"
+              width={200}
+              height={108}
+              className="h-auto w-40"
+            />
           </Link>
-          <p className="mt-2 text-sm">© 2026 EL TONI. Todos los derechos reservados.</p>
+          <p className="mt-3 text-sm">© 2026 EL TONI. Todos los derechos reservados.</p>
         </div>
 
         <nav aria-label="Redes y enlaces del pie" className="flex flex-col gap-4">

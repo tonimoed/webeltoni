@@ -114,7 +114,11 @@ export function ProductPopup({
             <div className="flex gap-2">
               <input
                 id={`waitlist-${product.id}`}
+                name="email"
                 type="email"
+                inputMode="email"
+                autoComplete="email"
+                spellCheck={false}
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}

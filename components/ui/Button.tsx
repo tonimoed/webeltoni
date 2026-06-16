@@ -31,6 +31,7 @@ interface ActionButtonProps extends CommonProps {
   onClick: () => void;
   type?: "button" | "submit";
   ariaLabel?: string;
+  disabled?: boolean;
 }
 
 export function LinkButton({
@@ -72,6 +73,7 @@ export function ActionButton({
   ariaLabel,
   variant = "primary",
   className = "",
+  disabled,
   children,
 }: ActionButtonProps) {
   return (
@@ -79,7 +81,8 @@ export function ActionButton({
       type={type}
       onClick={onClick}
       aria-label={ariaLabel}
-      className={`${base} ${variants[variant]} ${className}`}
+      disabled={disabled}
+      className={`${base} ${variants[variant]} ${className} disabled:cursor-not-allowed disabled:opacity-60`}
     >
       {children}
     </button>

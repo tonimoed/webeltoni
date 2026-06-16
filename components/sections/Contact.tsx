@@ -87,6 +87,8 @@ export function Contact() {
             </label>
             <input
               id="c-nombre"
+              name="nombre"
+              autoComplete="name"
               value={nombre}
               onChange={(e) => setNombre(e.target.value)}
               aria-invalid={!!errors.nombre}
@@ -106,12 +108,17 @@ export function Contact() {
             </label>
             <input
               id="c-email"
+              name="email"
               type="email"
+              inputMode="email"
+              autoComplete="email"
+              spellCheck={false}
+              placeholder="tu@email.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               aria-invalid={!!errors.email}
               aria-describedby={errors.email ? "err-email" : undefined}
-              className="min-h-11 w-full rounded-lg border border-cream/20 bg-cream/5 px-3 text-cream"
+              className="min-h-11 w-full rounded-lg border border-cream/20 bg-cream/5 px-3 text-cream placeholder:text-cream/40"
             />
             {errors.email && (
               <p id="err-email" className="mt-1 text-sm text-amber">
@@ -142,6 +149,7 @@ export function Contact() {
             </label>
             <textarea
               id="c-mensaje"
+              name="mensaje"
               rows={4}
               value={mensaje}
               onChange={(e) => setMensaje(e.target.value)}
@@ -156,7 +164,12 @@ export function Contact() {
             )}
           </div>
 
-          <ActionButton onClick={() => {}} type="submit" className="w-full">
+          <ActionButton
+            onClick={() => {}}
+            type="submit"
+            className="w-full"
+            disabled={status === "submitting"}
+          >
             {status === "submitting" ? "Enviando…" : "Enviar"}
           </ActionButton>
 
