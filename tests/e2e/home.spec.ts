@@ -12,16 +12,21 @@ test.describe("home", () => {
     const notFound: string[] = [];
     page.on("pageerror", (e) => pageErrors.push(e.message));
     page.on("response", (r) => {
-      if (r.status() === 404) notFound.push(new URL(r.url()).pathname);
+      const u = new URL(r.url());
+      // only our own (localhost) 404s matter; external CDNs (e.g. the YouTube
+      // thumbnail maxresdefault.jpg, which 404s for some clips and falls back to
+      // hqdefault) are not our concern.
+      const local = u.hostname === "localhost" || u.hostname === "127.0.0.1";
+      if (r.status() === 404 && local) notFound.push(u.pathname);
     });
 
     const res = await page.goto("/");
     expect(res?.status()).toBeLessThan(400);
 
     await expect(page.locator("h1")).toHaveText(/EL TONI/);
-    await expect(page.locator("header a", { hasText: "EL TONI" }).first()).toBeVisible();
+    await expect(page.getByRole("link", { name: /EL TONI/ }).first()).toBeVisible();
 
-    for (const id of ["inicio", "escuchar", "plataformas", "sobre-mi", "momento", "tienda", "seguir", "contacto"]) {
+    for (const id of ["inicio", "escuchar", "videos", "tienda"]) {
       await expect(page.locator(`#${id}`)).toHaveCount(1);
     }
 
@@ -61,12 +66,6 @@ test.describe("home", () => {
     }
   });
 
-  test("mailto is present and correct", async ({ page }) => {
-    await page.goto("/");
-    const mailto = page.getByTestId("mailto-link");
-    await expect(mailto).toHaveAttribute("href", /^mailto:eltonihidalgo@gmail\.com/);
-  });
-
   test("ambient audio exists and starts muted; toggle flips state", async ({ page }) => {
     await page.goto("/");
     const audio = page.getByTestId("ambient-audio");
@@ -80,23 +79,4 @@ test.describe("home", () => {
     await expect(toggle).toHaveAttribute("aria-pressed", "true");
   });
 
-  test("contact form: shows validation errors then a mocked success", async ({ page }) => {
-    await page.goto("/");
-    await page.locator("#contacto").scrollIntoViewIfNeeded();
-
-    // empty submit -> client validation errors
-    await page.getByRole("button", { name: "Enviar" }).click();
-    await expect(page.locator("#err-email")).toBeVisible();
-
-    // mock the provider endpoint
-    await page.route("**/api/contact", (route) =>
-      route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ ok: true }) }),
-    );
-
-    await page.fill("#c-nombre", "Ana");
-    await page.fill("#c-email", "ana@example.com");
-    await page.fill("#c-mensaje", "Hola, quiero info de booking.");
-    await page.getByRole("button", { name: "Enviar" }).click();
-    await expect(page.getByText(/Gracias/)).toBeVisible();
-  });
 });

@@ -1,67 +1,113 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
+import { useEffect, useRef } from "react";
 import { site } from "@/content/site.config";
-import { LinkButton } from "@/components/ui/Button";
-import { ScrollCue } from "@/components/ui/ScrollCue";
-import { useAudio } from "@/components/audio/AudioProvider";
+import { BrandIcon, type IconKey } from "@/components/ui/BrandIcons";
+import { track } from "@/lib/analytics";
 
 /**
- * Hero (#inicio) — oversized name over full-bleed portrait on deep red.
- * The portrait is the LCP image: priority + preloaded, no layout shift.
+ * Hero (#inicio) — full-bleed looping videoclip as the whole "first page".
+ * Minimal Drake-style framing: wordmark top-left, streaming/social logos
+ * top-right, nothing else. Video is muted + looped (paused under reduced
+ * motion).
  */
+
+const ALL_LOGOS: { key: IconKey; label: string; href: string }[] = [
+  { key: "spotify", label: "Spotify", href: site.socials.spotify },
+  { key: "appleMusic", label: "Apple Music", href: site.socials.appleMusic },
+  { key: "youtube", label: "YouTube", href: site.socials.youtube },
+  { key: "instagram", label: "Instagram", href: site.socials.instagram },
+  { key: "tiktok", label: "TikTok", href: site.socials.tiktok },
+];
+const LOGOS = ALL_LOGOS.filter((l) => l.href.trim().length > 0);
+
 export function Hero() {
-  const { enabled, nowPlaying } = useAudio();
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+
+  useEffect(() => {
+    const v = videoRef.current;
+    if (!v) return;
+    const reduce = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+    if (!reduce) v.play().catch(() => {});
+  }, []);
 
   return (
     <section
       id="inicio"
-      className="relative flex h-[100svh] min-h-[600px] w-full flex-col justify-end overflow-hidden bg-red-deep"
+      className="relative h-[100svh] min-h-[600px] w-full overflow-hidden bg-ink text-cream"
     >
-      <Image
-        src={site.photos.heroRed}
-        alt="EL TONI con traje color crema sobre fondo rojo intenso"
-        fill
-        priority
-        fetchPriority="high"
-        sizes="100vw"
-        className="object-cover object-[center_20%]"
-      />
-      {/* warm gradient for text legibility */}
+      {/* full-bleed videoclip — page 1 is the whole, clean videoclip */}
+      <video
+        ref={videoRef}
+        className="absolute inset-0 h-full w-full object-cover"
+        poster={site.latest.cover}
+        muted
+        loop
+        playsInline
+        preload="auto"
+        aria-label={`Videoclip de ${site.latest.title}`}
+      >
+        <source src={site.heroVideo} type="video/mp4" />
+      </video>
+
+      {/* top scrim for wordmark/logo legibility */}
       <div
         aria-hidden="true"
-        className="absolute inset-0 bg-gradient-to-t from-ink/85 via-ink/25 to-ink/40"
+        className="absolute inset-x-0 top-0 h-36 bg-gradient-to-b from-ink/70 to-transparent"
       />
+      {/* top-centre EL TONI logo (signature) — the page's single h1 (SEO/a11y) */}
+      <h1 className="absolute left-1/2 top-5 z-20 m-0 -translate-x-1/2">
+        <Link href="#inicio" aria-label="EL TONI — urbano latino" className="block">
+          <span className="sr-only">EL TONI</span>
+          <Image
+            src="/assets/brand/signature-cream.png"
+            alt="EL TONI"
+            width={909}
+            height={932}
+            unoptimized
+            priority
+            className="h-16 w-auto [filter:drop-shadow(0_3px_16px_rgba(0,0,0,0.6))] sm:h-20"
+          />
+        </Link>
+      </h1>
 
-      <div className="relative z-10 mx-auto w-full max-w-[1280px] px-5 pb-16 sm:pb-20">
-        <h1 className="font-display text-cream text-hero">
-          <span className="block">EL TONI</span>
-        </h1>
+      {/* middle navigation spread across the page: Música · Tienda · Vídeos */}
+      <nav
+        aria-label="Secciones"
+        className="hero-nav absolute left-0 top-1/2 z-20 flex w-full -translate-y-1/2 items-center justify-between px-[clamp(1.25rem,7vw,6rem)] text-sm font-semibold uppercase tracking-[0.22em] sm:text-base"
+      >
+        <Link href="#escuchar" className="hero-link">
+          Música
+        </Link>
+        <Link href="#tienda" className="hero-link">
+          Tienda
+        </Link>
+        <Link href="#videos" className="hero-link">
+          Vídeos
+        </Link>
+      </nav>
 
-        <p className="mt-3 max-w-xl text-base text-cream/90 sm:text-lg">
-          {site.heroHook}
-        </p>
-        <p className="mt-1 font-display text-amber text-2xl sm:text-3xl">
-          {site.lyricAccent}
-        </p>
-
-        <div className="mt-7 flex flex-wrap items-center gap-3">
-          <LinkButton href="#escuchar" variant="primary">
-            Escuchar ahora
-          </LinkButton>
-          <LinkButton href="#tienda" variant="ghost">
-            Tienda
-          </LinkButton>
-        </div>
-
-        <p className="mt-6 text-xs uppercase tracking-[0.25em] text-cream/70">
-          {enabled ? `Ahora suena: ${nowPlaying}` : "Activa el sonido ↗"}
-        </p>
-      </div>
-
-      <div className="absolute inset-x-0 bottom-5 z-10 flex justify-center">
-        <ScrollCue />
-      </div>
+      {/* bottom-centre social logos */}
+      <nav
+        aria-label="Redes sociales"
+        className="absolute bottom-7 left-1/2 z-20 flex -translate-x-1/2 items-center gap-5 sm:gap-6"
+      >
+        {LOGOS.map((l) => (
+          <a
+            key={l.key}
+            href={l.href}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label={l.label}
+            onClick={() => track("follow_click", { platform: l.key })}
+            className="connect-logo block"
+          >
+            <BrandIcon name={l.key} className="h-6 w-6 sm:h-7 sm:w-7" />
+          </a>
+        ))}
+      </nav>
     </section>
   );
 }

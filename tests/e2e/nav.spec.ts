@@ -2,7 +2,7 @@ import { test, expect } from "@playwright/test";
 
 const NAV = [
   { label: "Música", hash: "#escuchar" },
-  { label: "Sobre mí", hash: "#sobre-mi" },
+  { label: "Vídeos", hash: "#videos" },
   { label: "Tienda", hash: "#tienda" },
 ];
 
@@ -29,11 +29,13 @@ test.describe("navigation", () => {
     });
   }
 
-  test("#momento reveals on scroll (IntersectionObserver)", async ({ page }) => {
+  test("#videos shows the videoclip deck and a YouTube subscribe link", async ({ page }) => {
     await page.goto("/");
-    const moment = page.getByTestId("visual-moment");
-    await page.locator("#momento").scrollIntoViewIfNeeded();
-    await expect.poll(() => moment.getAttribute("data-visible")).toBe("true");
-    await expect(moment).toHaveClass(/is-visible/);
+    await page.locator("#videos").scrollIntoViewIfNeeded();
+    // at least one video card in the coverflow
+    await expect(page.locator("#videos .p2-vid-card").first()).toBeVisible();
+    // subscribe button points at the sub_confirmation URL
+    const sub = page.locator("#videos a", { hasText: "Suscríbete" });
+    await expect(sub).toHaveAttribute("href", /sub_confirmation=1/);
   });
 });

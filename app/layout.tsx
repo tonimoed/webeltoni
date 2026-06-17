@@ -5,7 +5,6 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import "./globals.css";
 import { site } from "@/content/site.config";
 import { AudioProvider } from "@/components/audio/AudioProvider";
-import { StickyNav } from "@/components/nav/StickyNav";
 import { Grain } from "@/components/ui/Grain";
 import { ScrollDepth } from "@/components/ScrollDepth";
 
@@ -95,7 +94,6 @@ export default function RootLayout({
         </a>
         <MusicGroupJsonLd />
         <AudioProvider>
-          <StickyNav />
           <main>{children}</main>
         </AudioProvider>
         <Grain />

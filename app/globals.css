@@ -32,8 +32,7 @@
 html {
   scroll-behavior: smooth;
   background: var(--color-ink);
-  /* offset anchor jumps so the sticky nav doesn't cover section tops */
-  scroll-padding-top: 5rem;
+  scroll-padding-top: 0;
 }
 
 /* balanced headings, pretty body wrapping */
@@ -120,4 +119,825 @@ select,
 textarea {
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
+}
+
+/* ------------------------------------------------------------------ */
+/* Vinyl MusicPlayer widget (components/ui/music-player-widget.tsx).   */
+/* The upstream snippet shipped only the keyframes; these are the full */
+/* component styles, themed to the EL TONI palette.                    */
+/* ------------------------------------------------------------------ */
+@keyframes cover-in {
+  from { opacity: 0; transform: scale(1.08); }
+  to { opacity: 1; transform: scale(1); }
+}
+@keyframes cover-out {
+  from { opacity: 1; transform: scale(1); }
+  to { opacity: 0; transform: scale(0.9); }
+}
+@keyframes ti-in {
+  from { opacity: 0; transform: translateX(var(--dx)); }
+  to { opacity: 1; transform: translateX(0); }
+}
+@keyframes ti-out {
+  from { opacity: 1; transform: translateX(0); }
+  to { opacity: 0; transform: translateX(var(--dx)); }
+}
+
+.card {
+  display: flex;
+  align-items: center;
+  gap: clamp(1.5rem, 4vw, 3rem);
+  width: min(100%, 620px);
+  padding: clamp(1.25rem, 3vw, 2rem);
+  border-radius: 1.5rem;
+  background: rgba(243, 236, 224, 0.05);
+  border: 1px solid rgba(243, 236, 224, 0.12);
+  backdrop-filter: blur(14px);
+  color: var(--color-cream);
+}
+@media (max-width: 560px) {
+  .card { flex-direction: column; text-align: center; }
+}
+
+/* disc */
+.mask {
+  position: relative;
+  width: clamp(150px, 30vw, 220px);
+  aspect-ratio: 1;
+  flex-shrink: 0;
+  border-radius: 50%;
+  overflow: hidden;
+  cursor: pointer;
+  box-shadow: 0 22px 55px rgba(0, 0, 0, 0.55);
+  transition: transform 0.4s ease;
+}
+.mask.is-zoomed { transform: scale(1.06); }
+.spin { position: absolute; inset: 0; will-change: transform; }
+.cover {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+  user-select: none;
+}
+.cover-enter { animation: cover-in 0.7s ease both; }
+.cover-exit { animation: cover-out 0.7s ease both; z-index: -1; }
+.hole {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: 22%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: var(--color-ink);
+  display: grid;
+  place-items: center;
+  box-shadow: inset 0 0 0 4px rgba(243, 236, 224, 0.18);
+}
+.hole-inner { width: 28%; aspect-ratio: 1; border-radius: 50%; background: var(--color-cream); }
+
+/* info column */
+.info {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+.scales {
+  position: absolute;
+  top: -8px;
+  right: 0;
+  width: 62px;
+  height: auto;
+  color: var(--color-amber);
+  opacity: 0.32;
+  pointer-events: none;
+}
+.scales circle { fill: currentColor; }
+
+.track-info { position: relative; min-height: 3.6rem; }
+.ti-abs { position: absolute; inset: 0; }
+.artist {
+  margin: 0;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.25em;
+  color: var(--color-amber);
+}
+.track {
+  margin: 0.2rem 0 0;
+  font-family: var(--font-display), "Arial Narrow", sans-serif;
+  font-size: clamp(1.5rem, 4vw, 2.2rem);
+  line-height: 1;
+  text-transform: uppercase;
+}
+.ti-enter { animation: ti-in 0.5s ease both; }
+.ti-exit { animation: ti-out 0.5s ease both; }
+
+/* progress */
+.bar {
+  position: relative;
+  height: 6px;
+  border-radius: 999px;
+  background: rgba(243, 236, 224, 0.16);
+  cursor: pointer;
+}
+.bar-fill { height: 100%; border-radius: 999px; background: var(--color-red); }
+.time {
+  display: flex;
+  gap: 0.4rem;
+  font-size: 0.7rem;
+  font-variant-numeric: tabular-nums;
+  color: rgba(243, 236, 224, 0.6);
+}
+.time .sep { opacity: 0.5; }
+
+/* controls */
+.controls { display: flex; align-items: center; gap: 0.5rem; }
+.ctrl {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: rgba(243, 236, 224, 0.08);
+  color: var(--color-cream);
+  transition: background 0.2s, color 0.2s;
+}
+.ctrl:hover { background: rgba(243, 236, 224, 0.18); }
+.ctrl-play { width: 48px; height: 48px; background: var(--color-red); color: #fff; }
+.ctrl-play:hover { background: var(--color-red-hover); }
+.ctrl-toggle.is-active { color: var(--color-amber); }
+.ctrl-loop { position: relative; }
+.loop-one {
+  position: absolute;
+  bottom: 3px;
+  right: 6px;
+  font-size: 0.55rem;
+  font-weight: 700;
+  opacity: 0;
+}
+.ctrl-loop.mode-one .loop-one { opacity: 1; }
+
+@media (prefers-reduced-motion: reduce) {
+  .cover-enter,
+  .cover-exit,
+  .ti-enter,
+  .ti-exit { animation: none; }
+  .mask.is-zoomed { transition: none; }
+}
+
+/* castizo variant — no disc; a warm tavern control panel over the cover bg */
+.card.castizo {
+  flex-direction: column;
+  width: min(100%, 560px);
+  margin: 0 auto;
+  padding: clamp(1.5rem, 4vw, 2.25rem);
+  background: linear-gradient(rgba(58, 32, 8, 0.5), rgba(26, 19, 16, 0.62));
+  border: 1px solid rgba(232, 163, 61, 0.38);
+  box-shadow:
+    0 24px 70px rgba(0, 0, 0, 0.55),
+    inset 0 0 0 1px rgba(232, 163, 61, 0.08);
+}
+.castizo .info { width: 100%; align-items: center; gap: 1rem; text-align: center; }
+.castizo .scales {
+  position: static;
+  width: 84px;
+  margin: 0 auto;
+  opacity: 0.45;
+  color: var(--color-amber);
+}
+.castizo .track-info { min-height: 3rem; text-align: center; }
+.castizo .track { font-size: clamp(1.8rem, 5vw, 2.6rem); }
+.castizo .bar { width: 100%; background: rgba(232, 163, 61, 0.2); }
+.castizo .bar-fill { background: var(--color-amber); }
+.castizo .controls { justify-content: center; gap: 0.75rem; }
+.castizo .ctrl {
+  width: 46px;
+  height: 46px;
+  background: radial-gradient(circle at 32% 26%, rgba(232, 163, 61, 0.26), rgba(58, 32, 8, 0.65));
+  border: 1px solid rgba(232, 163, 61, 0.42);
+  color: var(--color-amber);
+}
+.castizo .ctrl:hover { background: rgba(232, 163, 61, 0.34); color: #fff; }
+.castizo .ctrl-play {
+  width: 62px;
+  height: 62px;
+  background: radial-gradient(circle at 32% 26%, #e8a33d, #a4161a 90%);
+  border: 1px solid rgba(232, 163, 61, 0.75);
+  color: #fff;
+  box-shadow: 0 0 26px rgba(232, 163, 61, 0.4);
+}
+.castizo .ctrl-play:hover { filter: brightness(1.08); }
+.castizo .ctrl-toggle.is-active {
+  color: #fff;
+  background: rgba(164, 22, 26, 0.5);
+  border-color: rgba(232, 163, 61, 0.7);
+}
+/* EL TONI artist label styled like the page wordmark, above the title */
+.castizo .artist {
+  font-family: var(--font-display), "Arial Narrow", sans-serif;
+  font-size: 1.35rem;
+  letter-spacing: -0.01em;
+  text-transform: uppercase;
+  color: var(--color-cream);
+}
+
+/* beating background cover */
+@keyframes cover-beat {
+  0%,
+  100% { transform: scale(1.08); }
+  50% { transform: scale(1.15); }
+}
+.cover-bg {
+  transform: scale(1.08);
+  transition: transform 0.7s ease;
+}
+.cover-bg.is-beating {
+  animation: cover-beat 2.2s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .cover-bg.is-beating { animation: none; }
+}
+
+/* --------------------------------------------------------------------- */
+/* Page 2 (#escuchar) — discography fan + glass player.                  */
+/* Deep-red press-photo palette (FOTO PERFIL).                           */
+/* --------------------------------------------------------------------- */
+.p2 {
+  background:
+    /* only the BOTTOM fades to dark (toward the black Vídeos page); the top
+       stays red so it blends with the Hero above */
+    linear-gradient(to bottom, transparent 82%, #07040a 100%),
+    radial-gradient(120% 85% at 50% -5%, #a4161a 0%, #a4161a 30%, #6e0d10 66%, #360507 100%);
+}
+.p2::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(120% 75% at 50% 40%, transparent 55%, rgba(0, 0, 0, 0.42) 100%);
+}
+
+/* artist photo — desktop: fade the left edge so he melts into the red on the right.
+   mobile: photo is centred, so fade BOTH edges symmetrically. */
+.p2-artist {
+  -webkit-mask-image: linear-gradient(to right, transparent 0%, #000 38%, #000 100%);
+  mask-image: linear-gradient(to right, transparent 0%, #000 38%, #000 100%);
+}
+@media (max-width: 639px) {
+  .p2-artist {
+    -webkit-mask-image: linear-gradient(to right, transparent 0%, #000 24%, #000 76%, transparent 100%);
+    mask-image: linear-gradient(to right, transparent 0%, #000 24%, #000 76%, transparent 100%);
+  }
+}
+
+/* save-to-streaming pills — Fey-style bevelled glass that glows, on one line */
+.p2-save {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  white-space: nowrap;
+  height: 2.6rem;
+  padding: 0 1.15rem;
+  border-radius: 28px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  line-height: 1;
+  color: var(--color-cream);
+  background: radial-gradient(
+    61.35% 50.07% at 48.58% 50%,
+    rgba(28, 6, 8, 0.5) 0%,
+    rgba(243, 236, 224, 0.06) 100%
+  );
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  box-shadow:
+    inset 0 0 0 0.5px rgba(243, 236, 224, 0.22),
+    inset 1px 1px 0 -0.5px rgba(243, 236, 224, 0.4),
+    inset -1px -1px 0 -0.5px rgba(243, 236, 224, 0.4),
+    0 0 18px rgba(243, 236, 224, 0.12);
+  transition: background 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease;
+}
+.p2-save:hover {
+  background: radial-gradient(
+    61.35% 50.07% at 48.58% 50%,
+    rgba(42, 9, 11, 0.6) 0%,
+    rgba(243, 236, 224, 0.13) 100%
+  );
+  box-shadow:
+    inset 0 0 0 0.5px rgba(243, 236, 224, 0.32),
+    inset 1px 1px 0 -0.5px rgba(243, 236, 224, 0.5),
+    inset -1px -1px 0 -0.5px rgba(243, 236, 224, 0.5),
+    0 0 28px rgba(243, 236, 224, 0.34);
+  transform: translateY(-1px);
+}
+/* shine sweep — a real <span> streak that glints across to invite a tap.
+   (Uses a normal element + class because Lightning CSS drops keyframes that
+   are only referenced from a pseudo-element's animation.) */
+.p2-shine {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  border-radius: inherit;
+  pointer-events: none;
+  background: linear-gradient(
+    -75deg,
+    transparent 38%,
+    rgba(255, 255, 255, 0.45) 50%,
+    transparent 62%
+  );
+  transform: translateX(-130%);
+  animation: eltoni-shine 3.4s ease-in-out infinite;
+}
+.p2-save:hover .p2-shine {
+  animation-duration: 1.6s;
+}
+@keyframes eltoni-shine {
+  0% { transform: translateX(-130%); }
+  32% { transform: translateX(130%); }
+  100% { transform: translateX(130%); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .p2-shine { animation: none; }
+}
+
+/* full-bleed coverflow of covers */
+.p2-fan { perspective: 1400px; }
+.p2-card {
+  --cw: clamp(150px, 23vw, 270px);
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: var(--cw);
+  aspect-ratio: 1;
+  margin-left: calc(var(--cw) / -2);
+  margin-top: calc(var(--cw) / -2);
+  border: 0;
+  padding: 0;
+  background: none;
+  cursor: pointer;
+  border-radius: 16px;
+  overflow: hidden;
+  transform-origin: center;
+  will-change: transform, opacity;
+  box-shadow: 0 22px 50px rgba(0, 0, 0, 0.55);
+}
+.p2-card img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.p2-card.is-active { outline: 3px solid var(--color-cream); outline-offset: 2px; }
+
+/* glass player card — the playing single's cover fills it (blurred + scrim) */
+.p2-glass {
+  border-radius: 22px;
+  padding: 18px 20px;
+  border: 1px solid rgba(243, 236, 224, 0.16);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5);
+  animation: p2-pop 0.35s ease both;
+}
+.p2-cover-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scale(1.06);
+  filter: blur(1px) brightness(0.97) saturate(1.25);
+  animation: p2-cover-fade 0.5s ease both;
+}
+.p2-cover-scrim {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(15, 3, 5, 0.48) 0%,
+    rgba(15, 3, 5, 0.14) 42%,
+    rgba(15, 3, 5, 0.55) 100%
+  );
+}
+@keyframes p2-cover-fade {
+  from { opacity: 0.25; }
+  to { opacity: 1; }
+}
+@keyframes p2-pop {
+  from { opacity: 0; transform: translateY(14px) scale(0.97); }
+  to { opacity: 1; transform: none; }
+}
+/* live audio-reactive waveform (canvas, drawn from the analyser in Waveform.tsx) */
+.p2-wave {
+  display: block;
+  width: 100%;
+  height: 54px;
+}
+.p2-ctrl {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  color: var(--color-cream);
+  cursor: pointer;
+  transition: transform 0.15s ease, background 0.2s ease;
+}
+.p2-ctrl:hover { background: rgba(243, 236, 224, 0.12); }
+.p2-ctrl:active { transform: scale(0.92); }
+.p2-ctrl-play {
+  width: 58px;
+  height: 58px;
+  background: var(--color-cream);
+  color: var(--color-red-deep);
+}
+.p2-ctrl-play:hover { background: #fff; }
+@media (prefers-reduced-motion: reduce) {
+  .p2-glass { animation: none; }
+}
+
+/* --------------------------------------------------------------------- */
+/* Page 3 — YouTube videoclip coverflow (components/sections/VideoGallery) */
+/* Static deck; reuses .p2-fan (perspective) and .p2-card (deck slot).     */
+/* White base + soft red radial glow (components/ui/glow-background) — keeps   */
+/* following page 2's red while staying bright.                              */
+/* --------------------------------------------------------------------- */
+.p3 {
+  /* deep black with a subtle neutral depth (no red) */
+  background: radial-gradient(120% 85% at 50% 42%, #0c0d12 0%, #060709 55%, #000 100%);
+}
+.p2-vid-card {
+  --cw: clamp(280px, 88vw, 880px);
+  aspect-ratio: 16 / 9;
+  /* base .p2-card centres a square; recentre for the 16:9 height */
+  margin-top: calc(var(--cw) * -0.28125);
+}
+.p2-vid-frame {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  display: block;
+}
+/* title bar on the centred clip — translucent dark band (reads bluish over the
+   video, like the PNG) holding play + song title + duration */
+.p3-titlebar {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.7rem 0.95rem;
+  color: var(--color-cream);
+  background: linear-gradient(
+    to top,
+    rgba(8, 10, 22, 0.82) 0%,
+    rgba(8, 10, 22, 0.55) 60%,
+    rgba(8, 10, 22, 0) 100%
+  );
+  -webkit-backdrop-filter: blur(2px);
+  backdrop-filter: blur(2px);
+  pointer-events: none;
+}
+.p3-titlebar-name {
+  flex: 1;
+  min-width: 0;
+  text-align: left;
+  font-weight: 700;
+  font-size: clamp(0.95rem, 1.8vw, 1.35rem);
+  line-height: 1.05;
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.6);
+}
+.p3-titlebar-dur {
+  font-size: 0.8rem;
+  font-variant-numeric: tabular-nums;
+  opacity: 0.85;
+}
+.p2-vid-card:hover .p3-titlebar {
+  background: linear-gradient(
+    to top,
+    rgba(164, 22, 26, 0.85) 0%,
+    rgba(8, 10, 22, 0.5) 60%,
+    rgba(8, 10, 22, 0) 100%
+  );
+}
+
+/* left / right navigation arrows (the only thing that moves the deck) */
+.p3-arrow {
+  position: absolute;
+  top: 50%;
+  z-index: 25;
+  transform: translateY(-50%);
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  color: var(--color-cream);
+  background: rgba(8, 4, 5, 0.5);
+  border: 1px solid rgba(243, 236, 224, 0.22);
+  cursor: pointer;
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  transition: background 0.2s ease, transform 0.15s ease;
+}
+.p3-arrow:hover {
+  background: rgba(164, 22, 26, 0.7);
+  transform: translateY(-50%) scale(1.08);
+}
+
+/* "Ver en YouTube" hand-off after the 1-minute taster */
+.p3-cta {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 2rem;
+  color: var(--color-cream);
+  background: rgba(5, 1, 2, 0.78);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  animation: p2-cover-fade 0.3s ease both;
+}
+.p3-cta-eyebrow {
+  font-size: 0.85rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(243, 236, 224, 0.7);
+}
+.p3-cta-title {
+  margin-top: 0.35rem;
+  font-size: clamp(1.6rem, 5vw, 3rem);
+  font-weight: 800;
+  line-height: 1.02;
+}
+.p3-cta-back {
+  margin-top: 1rem;
+  font-size: 0.85rem;
+  color: rgba(243, 236, 224, 0.75);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+.p3-cta-back:hover {
+  color: var(--color-cream);
+}
+
+/* subscribe-to-YouTube pill (official red) */
+.p2-sub {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  height: 2.9rem;
+  padding: 0 1.4rem;
+  border-radius: 28px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #fff;
+  background: #ff0000;
+  box-shadow: 0 8px 30px rgba(255, 0, 0, 0.34);
+  transition: transform 0.15s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+.p2-sub:hover {
+  background: #ff1a1a;
+  transform: translateY(-1px);
+  box-shadow: 0 10px 38px rgba(255, 0, 0, 0.5);
+}
+
+/* --------------------------------------------------------------------- */
+/* Page 4 — Tienda (components/sections/Store): a cinematic looping scene   */
+/* of 5 lit street display cases in front of the Torre Miranda, with        */
+/* clickable hotspots over each case.                                       */
+/* --------------------------------------------------------------------- */
+.p4 {
+  background: #05070e; /* dark night letterbox around the scene */
+}
+/* full-bleed background video — fills the whole section (immersive) */
+.store-bg {
+  position: absolute;
+  inset: 0;
+}
+.store-bg-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+@media (prefers-reduced-motion: reduce) {
+  .store-bg {
+    transition: none;
+    transform: scale(1);
+  }
+}
+
+/* snow drifting in front of the whole scene */
+.store-snow {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 15;
+  pointer-events: none;
+  opacity: 0.55;
+  filter: blur(0.4px);
+}
+
+/* frosty "through-the-glass" frame: icy edges + cold vignette */
+.store-frost {
+  position: absolute;
+  inset: 0;
+  z-index: 16;
+  pointer-events: none;
+  background:
+    radial-gradient(60% 50% at 0% 0%, rgba(205, 232, 255, 0.16), transparent 60%),
+    radial-gradient(60% 50% at 100% 0%, rgba(205, 232, 255, 0.16), transparent 60%),
+    radial-gradient(70% 55% at 0% 100%, rgba(205, 232, 255, 0.12), transparent 60%),
+    radial-gradient(70% 55% at 100% 100%, rgba(205, 232, 255, 0.12), transparent 60%),
+    radial-gradient(120% 90% at 50% 50%, transparent 58%, rgba(8, 16, 32, 0.5) 100%);
+  box-shadow: inset 0 0 90px 24px rgba(150, 195, 235, 0.14);
+}
+/* invisible stage matching the rendered 16:9 video content (sized in JS); the
+   % hotspots live inside it so they track the cases under object-cover */
+.store-stage {
+  position: absolute;
+  z-index: 10;
+}
+
+/* twinkling starfield over the sky */
+.store-stars {
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 42%;
+  pointer-events: none;
+}
+.store-star {
+  position: absolute;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 0 4px rgba(255, 255, 255, 0.85);
+  opacity: 0.5;
+  animation: store-twinkle ease-in-out infinite;
+  will-change: opacity, transform;
+}
+@keyframes store-twinkle {
+  0%, 100% { opacity: 0.15; transform: scale(0.7); }
+  50% { opacity: 1; transform: scale(1.15); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .store-star {
+    animation: none;
+  }
+}
+
+/* invisible clickable hotspot over each case (the tee/ice/glow are baked into
+   the video); a subtle frame appears on hover/focus to signal it's clickable */
+.store-hotspot {
+  position: absolute;
+  padding: 0;
+  border: 1.5px solid transparent;
+  border-radius: 8px;
+  background: transparent;
+  cursor: pointer;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.store-hotspot:hover,
+.store-hotspot:focus-visible {
+  border-color: rgba(255, 255, 255, 0.55);
+  box-shadow: 0 0 22px rgba(180, 225, 255, 0.45);
+  outline: none;
+}
+
+/* centre case: a warm pulse invites the tap; hover/focus brightens + shows CTA */
+.store-hotspot--product {
+  z-index: 20; /* above the snow/frost so its glow + CTA read clearly */
+  border-color: transparent;
+  animation: store-pulse 2.8s ease-in-out infinite;
+}
+@keyframes store-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(255, 232, 170, 0); }
+  50% { box-shadow: 0 0 26px 2px rgba(255, 232, 170, 0.4); }
+}
+.store-hotspot--product:hover,
+.store-hotspot--product:focus-visible {
+  animation: none;
+  border-color: rgba(255, 232, 170, 0.7);
+  box-shadow: 0 0 38px 4px rgba(255, 232, 170, 0.5);
+}
+@media (prefers-reduced-motion: reduce) {
+  .store-hotspot--product {
+    animation: none;
+  }
+}
+
+/* --------------------------------------------------------------------- */
+/* Conecta (components/sections/Social) — chromatic-black footer-connect   */
+/* --------------------------------------------------------------------- */
+.connect {
+  background: #050506;
+}
+/* (used by the hero social logos) */
+.connect-logo {
+  color: var(--color-cream);
+  filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.22));
+  transition: transform 0.2s ease, filter 0.25s ease, color 0.2s ease;
+}
+.connect-logo:hover {
+  color: #fff;
+  transform: scale(1.14);
+  filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.6));
+}
+
+/* Hero middle nav — glowing links (components/sections/Hero) */
+.hero-link {
+  color: var(--color-cream);
+  text-shadow:
+    0 0 14px rgba(243, 236, 224, 0.5),
+    0 2px 10px rgba(0, 0, 0, 0.7);
+  transition: color 0.2s ease, text-shadow 0.25s ease;
+}
+.hero-link:hover {
+  color: #fff;
+  text-shadow:
+    0 0 18px rgba(255, 255, 255, 0.7),
+    0 0 32px rgba(232, 163, 61, 0.5),
+    0 2px 10px rgba(0, 0, 0, 0.7);
+}
+
+/* transient "Próximamente…" toast over the store (appears then fades out) */
+.store-toast {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 30;
+  transform: translate(-50%, -50%);
+  padding: 0.7rem 1.3rem;
+  border-radius: 999px;
+  font-size: clamp(0.9rem, 2.6vw, 1.25rem);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--color-cream);
+  background: rgba(8, 10, 18, 0.6);
+  border: 1px solid rgba(200, 235, 255, 0.25);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  pointer-events: none;
+  animation: store-toast 1.9s ease forwards;
+}
+@keyframes store-toast {
+  0% { opacity: 0; transform: translate(-50%, -42%); }
+  15% { opacity: 1; transform: translate(-50%, -50%); }
+  75% { opacity: 1; transform: translate(-50%, -50%); }
+  100% { opacity: 0; transform: translate(-50%, -58%); }
+}
+
+/* fade each full-height section's top+bottom edge to pure black so the seam
+   between adjacent pages is black→black (no visible cut). Edges only (~8%),
+   so centred content isn't dimmed. */
+#videos::before,
+#tienda::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 40;
+  pointer-events: none;
+  background: linear-gradient(
+    to bottom,
+    #000 0%,
+    rgba(0, 0, 0, 0) 9%,
+    rgba(0, 0, 0, 0) 91%,
+    #000 100%
+  );
+}
+/* page 2: TOP edge fades from a very dark RED (not pure black) so it fuses with
+   page 2's red instead of showing a black band; the BOTTOM still fades to black
+   to join page 3. Soft, eased stops so neither edge of the fade is visible. */
+#escuchar::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 40;
+  pointer-events: none;
+  background: linear-gradient(
+    to bottom,
+    #1c0507 0%,
+    rgba(28, 5, 7, 0.55) 3%,
+    rgba(28, 5, 7, 0.18) 6%,
+    rgba(28, 5, 7, 0) 9%,
+    rgba(0, 0, 0, 0) 91%,
+    #000 100%
+  );
 }

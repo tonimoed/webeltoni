@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { site } from "@/content/site.config";
@@ -33,12 +34,16 @@ export function StickyNav() {
         aria-label="Principal"
         className="mx-auto flex max-w-[1280px] items-center justify-between gap-4 px-5 py-3"
       >
-        <Link
-          href="#inicio"
-          className="font-display text-2xl tracking-tight"
-          aria-label={`${site.artist} — inicio`}
-        >
-          {site.artist}
+        <Link href="#inicio" aria-label={`${site.artist} — inicio`}>
+          <Image
+            src={scrolled ? "/assets/brand/signature-ink.png" : "/assets/brand/signature-cream.png"}
+            alt={site.artist}
+            width={909}
+            height={932}
+            priority
+            unoptimized
+            className="h-11 w-auto"
+          />
         </Link>
 
         {/* desktop links */}
@@ -53,12 +58,6 @@ export function StickyNav() {
         </ul>
 
         <div className="flex items-center gap-2">
-          <Link
-            href="#escuchar"
-            className="hidden rounded-full bg-red px-5 py-2 text-sm font-semibold uppercase tracking-wide text-white hover:bg-red-hover sm:inline-block"
-          >
-            Escuchar
-          </Link>
           <AudioToggle />
 
           {/* mobile menu button */}
