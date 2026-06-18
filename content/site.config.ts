@@ -19,6 +19,9 @@ export interface MerchProduct {
 export const site = {
   artist: "EL TONI",
   lang: "es",
+  // Canonical production origin — used for metadata, canonical URLs, sitemap,
+  // robots and JSON-LD. Keep this in sync with the live Vercel domain.
+  url: "https://eltoni-landing.vercel.app",
   email: "eltonihidalgo@gmail.com",
   descriptor: "Urbano latino",
   heroHook: "Música para las cosas que no dijiste a tiempo.",
