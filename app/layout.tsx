@@ -169,6 +169,15 @@ function StructuredData() {
         url: p.buyUrl || SITE_URL,
       },
     })),
+    {
+      "@type": "FAQPage",
+      "@id": `${SITE_URL}/#faq`,
+      mainEntity: site.faq.map((f) => ({
+        "@type": "Question",
+        name: f.q,
+        acceptedAnswer: { "@type": "Answer", text: f.a },
+      })),
+    },
   ];
 
   const data = { "@context": "https://schema.org", "@graph": graph };

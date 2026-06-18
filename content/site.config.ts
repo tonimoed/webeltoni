@@ -100,6 +100,30 @@ export const site = {
     "Soy Toni. Hago canciones urbanas para las cosas que cuesta decir: el desamor, la duda, lo que se queda dentro. Sin postureo, sin promesas vacías. Solo letras honestas y melodías que se quedan contigo.",
 
   /**
+   * FAQ — answers the main branded search intents ("quién es El Toni", "dónde
+   * escuchar TU VENENO", etc.). Rendered as real, visible text in the footer AND
+   * mirrored into FAQPage JSON-LD, so it feeds both crawlers and AI Overviews.
+   */
+  faq: [
+    {
+      q: "¿Quién es EL TONI?",
+      a: "EL TONI (Toni) es un artista de urbano latino desde España. Hace canciones honestas sobre el amor, el desamor y lo que cuesta decir, sin postureo ni promesas vacías.",
+    },
+    {
+      q: "¿Dónde puedo escuchar a EL TONI?",
+      a: "En Spotify, Apple Music y YouTube. Su último single, TU VENENO, está disponible en todas las plataformas.",
+    },
+    {
+      q: "¿Cuál es el último single de EL TONI?",
+      a: "TU VENENO (2026), junto a NO VOLVERÉ, VOLVER A EMPEZAR, QUIÉN SERÁ MI AMOR? y el resto de su discografía 2025–2026.",
+    },
+    {
+      q: "¿EL TONI tiene merchandising?",
+      a: "Sí: la camiseta «LA QUE ME QUIERE OLVIDAR». Habrá nuevos drops próximamente; puedes apuntarte por email desde la tienda.",
+    },
+  ],
+
+  /**
    * YouTube videoclips, newest first — page 3 (#videos) embeds them via the
    * official YouTube IFrame player so every play counts as a real YouTube view.
    * `id` is the 11-char watch id; thumbnails derive from i.ytimg.com (no local
