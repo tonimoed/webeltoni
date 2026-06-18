@@ -90,7 +90,14 @@ export function Waveform({
         (window as unknown as { webkitAudioContext: AudioCtor }).webkitAudioContext;
       if (!Ctor) return;
       if (!actx) {
-        actx = new Ctor();
+        // Match the previews' native rate (all 44.1 kHz). A default 48 kHz context
+        // resamples the MediaElementSource and shifts the pitch — forcing 44100
+        // keeps the song at its real pitch. Fall back to default if unsupported.
+        try {
+          actx = new Ctor({ sampleRate: 44100 });
+        } catch {
+          actx = new Ctor();
+        }
         actx.onstatechange = wireGraph; // wire the moment it flips to "running"
       }
       if (actx.state === "suspended") actx.resume().catch(() => {});

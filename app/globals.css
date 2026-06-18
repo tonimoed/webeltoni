@@ -614,6 +614,14 @@ textarea {
   height: 100%;
   border: 0;
   display: block;
+  overflow: hidden;
+}
+/* the YouTube IFrame Player API injects its own iframe inside .p2-vid-frame */
+.p2-vid-frame iframe {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  display: block;
 }
 /* title bar on the centred clip — translucent dark band (reads bluish over the
    video, like the PNG) holding play + song title + duration */
@@ -804,6 +812,9 @@ textarea {
   height: 100%;
   object-fit: cover;
   display: block;
+  /* night grade — drops the brightness and adds contrast + vivacity so the
+     AI-generated scene reads more like a real night shot */
+  filter: brightness(0.8) contrast(1.14) saturate(1.2);
 }
 @media (prefers-reduced-motion: reduce) {
   .store-bg {

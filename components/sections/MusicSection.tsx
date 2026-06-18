@@ -35,6 +35,7 @@ const SINGLES: Single[] = site.releases.map((r) => ({
 }));
 const N = SINGLES.length;
 const DRIFT_PER_SEC = 0.4; // covers per second — always sliding
+const DECK_Y = -250; // lift the cover deck so it doesn't crowd the glass player
 
 export function MusicSection() {
   const fanRef = useRef<HTMLDivElement>(null);
@@ -85,7 +86,7 @@ export function MusicSection() {
       for (let i = 0; i < N; i++) {
         const el = cardRefs.current[i];
         if (!el) continue;
-        const p = placement(wrapDelta(i, center, N), spread, offsetX);
+        const p = placement(wrapDelta(i, center, N), spread, offsetX, DECK_Y);
         el.style.transform = p.transform;
         el.style.opacity = String(p.opacity);
         el.style.zIndex = String(p.zIndex);
@@ -175,7 +176,7 @@ export function MusicSection() {
       {/* full-bleed coverflow fan */}
       <div ref={fanRef} className="p2-fan absolute inset-0 z-10">
         {SINGLES.map((s, i) => {
-          const seed = placement(wrapDelta(i, 0, N), SEED_SPREAD, SEED_OFFSET);
+          const seed = placement(wrapDelta(i, 0, N), SEED_SPREAD, SEED_OFFSET, DECK_Y);
           return (
           <button
             key={s.title}

@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { site } from "@/content/site.config";
 import { BrandIcon } from "@/components/ui/BrandIcons";
 import CosmosBackground from "@/components/ui/cosmos-background";
+import { YouTubePlayer } from "@/components/ui/YouTubePlayer";
 import { pause, resume } from "@/lib/audio-bus";
 import { track } from "@/lib/analytics";
 import { wrapDelta, placement, SEED_SPREAD, SEED_OFFSET } from "@/lib/coverflow";
@@ -177,12 +178,10 @@ export function VideoGallery() {
               }}
             >
               {isPlaying ? (
-                <iframe
-                  className="p2-vid-frame"
-                  src={`https://www.youtube.com/embed/${v.id}?autoplay=1&rel=0&modestbranding=1&playsinline=1`}
+                <YouTubePlayer
+                  videoId={v.id}
                   title={`${v.title} — EL TONI`}
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                  allowFullScreen
+                  className="p2-vid-frame"
                 />
               ) : (
                 <>
