@@ -64,14 +64,13 @@ export const site = {
    * `spotify`/`appleMusic` are per-track "save/listen" deep links so the player
    * can link straight to the chosen song. Apple links come from the iTunes
    * catalog (artist 1841115561); Spotify links resolved via the Spotify
-   * connector. NO VOLVERÉ didn't surface a unique Spotify track (title collides
-   * with classics) → falls back to the artist page until a direct link exists.
+   * connector.
    */
   // `focus` = vertical % for the player's blurred cover-background crop, tuned
   // per cover so the face/subject sits well in the wide, short card (0 = top).
   releases: [
     { title: "TU VENENO", date: "2026-06-05", cover: "/assets/covers/tu-veneno.jpg", focus: 20, preview: "/assets/previews/tu-veneno.m4a", spotify: "https://open.spotify.com/track/5R3NwtIR7rF7LerqrzOXyF", appleMusic: "https://music.apple.com/es/album/tu-veneno/6773625019?i=6773625023" },
-    { title: "NO VOLVERÉ", date: "2026-04-15", cover: "/assets/covers/no-volvere.jpg", focus: 12, preview: "/assets/previews/no-volvere.m4a", spotify: "https://open.spotify.com/artist/7s116O3u1tP0IaPaRWhDcH", appleMusic: "https://music.apple.com/es/album/no-volvere/1890757145?i=1890757146" },
+    { title: "NO VOLVERÉ", date: "2026-04-15", cover: "/assets/covers/no-volvere.jpg", focus: 12, preview: "/assets/previews/no-volvere.m4a", spotify: "https://open.spotify.com/track/4b9nJA9OGxZiE1hlQsBSTq", appleMusic: "https://music.apple.com/es/album/no-volvere/1890757145?i=1890757146" },
     { title: "VOLVER A EMPEZAR", date: "2026-03-24", cover: "/assets/covers/volver-a-empezar.jpg", focus: 32, preview: "/assets/previews/volver-a-empezar.m4a", spotify: "https://open.spotify.com/track/1wIsaucdssLz2h26X1vyrJ", appleMusic: "https://music.apple.com/es/album/volver-a-empezar/1884183947?i=1884183948" },
     { title: "QUIÉN SERÁ MI AMOR?", date: "2026-02-13", cover: "/assets/covers/quien-sera-mi-amor.jpg", focus: 30, preview: "/assets/previews/quien-sera-mi-amor.m4a", spotify: "https://open.spotify.com/track/2l0xZt3ELWg8seYeHaxKBQ", appleMusic: "https://music.apple.com/es/album/quien-sera-mi-amor/1874718022?i=1874718023" },
     { title: "BAJO LA LLUVIA", date: "2025-12-10", cover: "/assets/covers/bajo-la-lluvia.jpg", focus: 20, preview: "/assets/previews/bajo-la-lluvia.m4a", spotify: "https://open.spotify.com/track/6qBnCA5sHZLTDu7b4UruoZ", appleMusic: "https://music.apple.com/es/album/bajo-la-lluvia/1857677413?i=1857677414" },
@@ -110,11 +109,12 @@ export const site = {
    * official YouTube IFrame player so every play counts as a real YouTube view.
    * `id` is the 11-char watch id; thumbnails derive from i.ytimg.com (no local
    * assets). Verified by scraping youtube.com/@eltonihidalgo on 2026-06-17;
-   * "(Audio)"-only uploads (NO VOLVERÉ, VOLVER A EMPEZAR) are excluded because
-   * they have no videoclip.
+   * VOLVER A EMPEZAR is excluded (no videoclip). NO VOLVERÉ is an "(Audio)" upload
+   * but is included by request (id E7hbPIsPLhY).
    */
   videos: [
     { title: "TU VENENO", id: "miKw8CN1IYI", duration: "2:18" },
+    { title: "NO VOLVERÉ", id: "E7hbPIsPLhY", duration: "2:38" },
     { title: "QUIÉN SERÁ MI AMOR?", id: "-lkFO-chQFU", duration: "2:51" },
     { title: "BAJO LA LLUVIA", id: "koi0k2vF2EA", duration: "3:43" },
     { title: "BAILO AL DOLOR", id: "3ayE9pAh3fE", duration: "2:37" },

@@ -601,6 +601,48 @@ textarea {
     #04060f 100%
   );
 }
+/* avioneta tirando de la pancarta — cruza el encabezado de izquierda a derecha en
+   bucle por fases. La imagen tiene la avioneta a la DERECHA y la pancarta a la
+   IZQUIERDA: al desplazarse hacia la derecha la avioneta sale primero por el borde
+   y queda sólo la pancarta; luego sale todo; pausa vacía; vuelve a entrar. */
+.p3-plane {
+  position: absolute;
+  /* vuela SÓLO por la banda oscura superior (sobre el cosmos negro), por encima de
+     la baraja pero sin pisar las portadas: ahí el WebM con alfa compone perfecto y
+     cualquier resto de borde del recorte queda invisible sobre el negro. Sin
+     mix-blend-mode → GPU, sin lag. */
+  top: -1vh;
+  left: 0;
+  z-index: 15;
+  width: clamp(210px, 27vw, 350px);
+  pointer-events: none;
+  will-change: transform;
+  transform: translateZ(0);
+  animation: p3-plane-fly 15s linear infinite;
+}
+.p3-plane video {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+@keyframes p3-plane-fly {
+  0% {
+    transform: translateX(-115%);
+  } /* entra por la izquierda */
+  70% {
+    transform: translateX(calc(100vw + 15%));
+  } /* cruza; la avioneta sale antes que la pancarta; todo fuera */
+  100% {
+    transform: translateX(calc(100vw + 15%));
+  } /* pausa vacía antes de re-entrar */
+}
+@media (prefers-reduced-motion: reduce) {
+  .p3-plane {
+    animation: none;
+    transform: translateX(-115%);
+  }
+}
+
 .p2-vid-card {
   --cw: clamp(280px, 88vw, 880px);
   aspect-ratio: 16 / 9;

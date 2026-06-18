@@ -208,6 +208,16 @@ export function VideoGallery() {
       <CosmosBackground />
       <h2 className="sr-only">Videoclips de EL TONI</h2>
 
+      {/* avioneta tirando de la pancarta — vídeo con alfa (hélice, pancarta al viento,
+          humo); cruza el encabezado en bucle. WebM con transparencia real; MP4 de
+          respaldo (Safari) */}
+      <div className="p3-plane" aria-hidden="true">
+        <video autoPlay muted loop playsInline preload="auto">
+          <source src="/assets/plane/avioneta-mensaje.webm" type="video/webm" />
+          <source src="/assets/plane/avioneta-mensaje.mp4" type="video/mp4" />
+        </video>
+      </div>
+
       {/* static coverflow deck */}
       <div ref={fanRef} className="p2-fan absolute inset-0 z-10">
         {VIDEOS.map((v, i) => {
