@@ -784,6 +784,9 @@ textarea {
 /* mobile: horizontal swipes pan the scene (JS), vertical still scrolls the page */
 @media (max-width: 639px) {
   .p4 { touch-action: pan-y; }
+  /* en móvil hay más espacio oscuro arriba → baja la avioneta (en escritorio se
+     queda en -1vh). Nota: regla anidada en un @media existente a propósito */
+  .p3-plane { top: 9vh; }
 }
 
 /* "‹ Desliza para ver más ›" — only on mobile, gently pulses then fades away */
