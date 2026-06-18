@@ -1,6 +1,5 @@
 import Image from "next/image";
 import Link from "next/link";
-import { site } from "@/content/site.config";
 
 /**
  * Footer — deliberately minimal and editorial so it reads as part of the
@@ -22,7 +21,6 @@ export function Footer() {
           unoptimized
           className="h-20 w-auto opacity-90 [filter:drop-shadow(0_3px_18px_rgba(0,0,0,0.6))]"
         />
-        <p className="max-w-md text-sm leading-relaxed text-cream/55">{site.footerLine}</p>
       </div>
 
       <div className="border-t border-cream/10">
