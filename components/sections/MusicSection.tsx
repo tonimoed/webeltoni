@@ -35,7 +35,7 @@ const SINGLES: Single[] = site.releases.map((r) => ({
 }));
 const N = SINGLES.length;
 const DRIFT_PER_SEC = 0.4; // covers per second — always sliding
-const DECK_Y = -250; // lift the cover deck so it doesn't crowd the glass player
+const DECK_Y = -215; // lift the cover deck so it doesn't crowd the glass player
 
 export function MusicSection() {
   const fanRef = useRef<HTMLDivElement>(null);

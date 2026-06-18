@@ -26,6 +26,26 @@ function InstagramAppIcon({ className }: { className?: string }) {
   );
 }
 
+/** The real Apple Music app icon: the note glyph in its pink→red gradient
+ *  squircle (the note reads white via the chip showing through the glyph hole). */
+function AppleMusicAppIcon({ className }: { className?: string }) {
+  return (
+    <span
+      className={`grid place-items-center overflow-hidden rounded-[6px] bg-white ${className ?? ""}`}
+    >
+      <svg viewBox="0 0 24 24" aria-hidden="true" className="h-full w-full scale-[1.14]">
+        <defs>
+          <linearGradient id="am-grad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stopColor="#FB5C74" />
+            <stop offset="1" stopColor="#FA233B" />
+          </linearGradient>
+        </defs>
+        <path d={ICON_PATHS.appleMusic} fill="url(#am-grad)" />
+      </svg>
+    </span>
+  );
+}
+
 /** The real TikTok app icon: the note in a black squircle, with the signature
  *  cyan/magenta glitch offsets — so it reads exactly like the app (and stays
  *  visible against the dark hero video, where a flat-black glyph would vanish). */
@@ -151,6 +171,8 @@ export function Hero() {
               <TikTokAppIcon />
             ) : l.key === "instagram" ? (
               <InstagramAppIcon className="h-6 w-6 sm:h-7 sm:w-7" />
+            ) : l.key === "appleMusic" ? (
+              <AppleMusicAppIcon className="h-6 w-6 sm:h-7 sm:w-7" />
             ) : (
               <BrandIcon name={l.key} className="h-6 w-6 sm:h-7 sm:w-7" />
             )}

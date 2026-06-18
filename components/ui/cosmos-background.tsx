@@ -73,7 +73,10 @@ export default function CosmosBackground() {
       h = canvas.clientHeight;
       canvas.width = Math.max(1, Math.round(w * SCALE));
       canvas.height = Math.max(1, Math.round(h * SCALE));
-      build();
+      // build the starfield ONCE — stars are stored in normalised coords, so a
+      // resize (e.g. mobile URL-bar show/hide on scroll) must NOT regenerate them
+      // or the field visibly "jumps" with no continuity.
+      if (stars.length === 0) build();
       if (reduce) drawFrame(0); // paint one static frame
     };
 
