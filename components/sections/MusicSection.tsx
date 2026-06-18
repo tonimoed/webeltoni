@@ -260,16 +260,18 @@ export function MusicSection() {
           </div>
         </div>
 
-        {/* save-to-streaming buttons — OUTSIDE the card, Fey-style glowing pills */}
-        <div className="pointer-events-auto flex w-[min(94vw,560px)] flex-col gap-2.5 sm:flex-row sm:gap-3">
+        {/* save-to-streaming buttons — OUTSIDE the card, Fey-style glowing pills.
+            Side by side (half/half) on every breakpoint so each is a big tap target;
+            the "Añadir a" prefix is hidden on mobile so the short label fits. */}
+        <div className="pointer-events-auto flex w-[min(94vw,560px)] flex-row gap-2.5 sm:gap-3">
           <a
             href={current.spotify}
             target="_blank"
             rel="noopener noreferrer"
             className="p2-save flex-1"
           >
-            <BrandIcon name="spotify" className="h-[18px] w-[18px]" />
-            Añadir a Spotify
+            <BrandIcon name="spotify" className="h-7 w-7 shrink-0 sm:h-[18px] sm:w-[18px]" />
+            <span className="hidden sm:inline">Añadir a&nbsp;</span>Spotify
             <span className="p2-shine" aria-hidden="true" />
           </a>
           <a
@@ -278,8 +280,8 @@ export function MusicSection() {
             rel="noopener noreferrer"
             className="p2-save flex-1"
           >
-            <BrandIcon name="appleMusic" className="h-[18px] w-[18px]" />
-            Añadir a Apple Music
+            <BrandIcon name="appleMusic" className="h-7 w-7 shrink-0 sm:h-[18px] sm:w-[18px]" />
+            <span className="hidden sm:inline">Añadir a&nbsp;</span>Apple Music
             <span className="p2-shine" aria-hidden="true" />
           </a>
         </div>

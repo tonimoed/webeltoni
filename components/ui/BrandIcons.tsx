@@ -29,4 +29,7 @@ export function BrandIcon({
   );
 }
 
+/** Raw glyph paths (e.g. to build the multi-colour TikTok app icon). */
+export const ICON_PATHS = PATHS;
+
 export type { IconKey };

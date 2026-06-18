@@ -394,6 +394,15 @@ textarea {
     -webkit-mask-image: linear-gradient(to right, transparent 0%, #000 24%, #000 76%, transparent 100%);
     mask-image: linear-gradient(to right, transparent 0%, #000 24%, #000 76%, transparent 100%);
   }
+  /* big tall "box" save buttons (half/half) with icon+label centred — easy taps */
+  .p2-save {
+    flex-direction: column;
+    gap: 0.5rem;
+    height: auto;
+    min-height: 5.25rem;
+    border-radius: 18px;
+    font-size: 0.95rem;
+  }
 }
 
 /* save-to-streaming pills — Fey-style bevelled glass that glows, on one line */
@@ -426,6 +435,17 @@ textarea {
     inset -1px -1px 0 -0.5px rgba(243, 236, 224, 0.4),
     0 0 18px rgba(243, 236, 224, 0.12);
   transition: background 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease;
+}
+/* mobile: big tall "box" buttons (half/half) with the label centred — easy taps */
+@media (max-width: 639px) {
+  .p2-save {
+    flex-direction: column;
+    gap: 0.5rem;
+    height: auto;
+    min-height: 5.25rem;
+    border-radius: 18px;
+    font-size: 0.95rem;
+  }
 }
 .p2-save:hover {
   background: radial-gradient(
@@ -568,8 +588,18 @@ textarea {
 /* following page 2's red while staying bright.                              */
 /* --------------------------------------------------------------------- */
 .p3 {
-  /* deep black with a subtle neutral depth (no red) */
-  background: radial-gradient(120% 85% at 50% 42%, #0c0d12 0%, #060709 55%, #000 100%);
+  /* vertical sky panorama ABOVE the page-4 plaza: deep black space up top
+     (seam into page 2 reads black→red) settling into the same deep navy that
+     crowns the store scene below (seam into page 4 is seamless). The animated
+     CosmosBackground canvas paints over this; this gradient is the static
+     fallback (reduced-motion / no-canvas). */
+  background: linear-gradient(
+    to bottom,
+    #000003 0%,
+    #010206 40%,
+    #02040b 80%,
+    #04060f 100%
+  );
 }
 .p2-vid-card {
   --cw: clamp(280px, 88vw, 880px);
@@ -723,6 +753,45 @@ textarea {
 .p4 {
   background: #05070e; /* dark night letterbox around the scene */
 }
+/* mobile: horizontal swipes pan the scene (JS), vertical still scrolls the page */
+@media (max-width: 639px) {
+  .p4 { touch-action: pan-y; }
+}
+
+/* "‹ Desliza para ver más ›" — only on mobile, gently pulses then fades away */
+.store-pan-hint {
+  display: none;
+}
+@media (max-width: 639px) {
+  .store-pan-hint {
+    display: block;
+    position: absolute;
+    left: 50%;
+    bottom: 7%;
+    z-index: 17;
+    transform: translateX(-50%);
+    padding: 0.4rem 0.9rem;
+    border-radius: 999px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+    color: var(--color-cream);
+    background: rgba(8, 16, 32, 0.5);
+    border: 1px solid rgba(205, 232, 255, 0.25);
+    -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: blur(6px);
+    pointer-events: none;
+    animation: store-pan-hint 5s ease forwards;
+  }
+}
+@keyframes store-pan-hint {
+  0%, 70% { opacity: 1; }
+  100% { opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .store-pan-hint { animation: none; opacity: 0.9; }
+}
 /* full-bleed background video — fills the whole section (immersive) */
 .store-bg {
   position: absolute;
@@ -856,9 +925,8 @@ textarea {
   transition: transform 0.2s ease, filter 0.25s ease, color 0.2s ease;
 }
 .connect-logo:hover {
-  color: #fff;
   transform: scale(1.14);
-  filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.6));
+  filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.6)) brightness(1.15);
 }
 
 /* Hero middle nav — glowing links (components/sections/Hero) */
@@ -907,8 +975,31 @@ textarea {
 /* fade each full-height section's top+bottom edge to pure black so the seam
    between adjacent pages is black→black (no visible cut). Edges only (~8%),
    so centred content isn't dimmed. */
-#videos::before,
 #tienda::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 40;
+  pointer-events: none;
+  /* TOP: a crisp black "perfilado" edge at the very top (mirrors how page 3
+     starts in black — the same defined seam as the 2→3 boundary), then the
+     store's night sky emerges out of page 3's deep navy so the sky still flows.
+     BOTTOM: fades to black for the footer seam. */
+  background: linear-gradient(
+    to bottom,
+    #000 0%,
+    #000 1.5%,
+    #05101f 7%,
+    rgba(9, 19, 34, 0.5) 13%,
+    rgba(9, 19, 34, 0) 24%,
+    rgba(0, 0, 0, 0) 91%,
+    #000 100%
+  );
+}
+/* page 3 (#videos): top stays pure black (cosmos) so the seam up into page 2
+   reads red→black. The bottom (footer edge) now fades to a crisp black profile
+   too, so the 3→4 seam is framed in black on BOTH sides — matching the 2→3 look. */
+#videos::before {
   content: "";
   position: absolute;
   inset: 0;
@@ -916,9 +1007,9 @@ textarea {
   pointer-events: none;
   background: linear-gradient(
     to bottom,
-    #000 0%,
-    rgba(0, 0, 0, 0) 9%,
-    rgba(0, 0, 0, 0) 91%,
+    rgba(0, 0, 0, 0) 76%,
+    rgba(0, 0, 0, 0.45) 89%,
+    rgba(0, 0, 0, 0.85) 96%,
     #000 100%
   );
 }

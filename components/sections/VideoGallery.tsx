@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { site } from "@/content/site.config";
 import { BrandIcon } from "@/components/ui/BrandIcons";
-import DynamicWaveBackground from "@/components/ui/dynamic-wave-canvas-background";
+import CosmosBackground from "@/components/ui/cosmos-background";
 import { pause, resume } from "@/lib/audio-bus";
 import { track } from "@/lib/analytics";
 import { wrapDelta, placement, SEED_SPREAD, SEED_OFFSET } from "@/lib/coverflow";
@@ -147,7 +147,7 @@ export function VideoGallery() {
       id="videos"
       className="p3 relative flex h-[100svh] min-h-[640px] w-full items-center justify-center overflow-hidden text-cream"
     >
-      <DynamicWaveBackground color={[0.1, 0.16, 0.3]} />
+      <CosmosBackground />
       <h2 className="sr-only">Videoclips de EL TONI</h2>
 
       {/* static coverflow deck */}
@@ -246,7 +246,7 @@ export function VideoGallery() {
       )}
 
       {/* subscribe to YouTube — red pill, footer */}
-      <div className="absolute bottom-8 left-0 z-20 flex w-full justify-center px-5">
+      <div className="absolute bottom-[14vh] left-0 z-20 flex w-full justify-center px-5">
         <a
           href={SUBSCRIBE_URL}
           target="_blank"

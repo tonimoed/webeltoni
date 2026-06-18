@@ -52,6 +52,10 @@ const STARS = (() => {
 export function Store() {
   const sectionRef = useRef<HTMLElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
+  const bgRef = useRef<HTMLDivElement>(null);
+  const panX = useRef(0); // mobile horizontal pan offset (px)
+  const panBounds = useRef({ min: 0, max: 0 });
+  const panInit = useRef(false);
   const vidTopRef = useRef<HTMLVideoElement>(null);
   const vidBaseRef = useRef<HTMLVideoElement>(null);
   const snowRef = useRef<HTMLCanvasElement>(null);
@@ -200,33 +204,123 @@ export function Store() {
     };
   }, []);
 
-  // Size/position the hotspot stage to match the 16:9 video content as rendered
-  // by object-cover over the full-bleed section, so hotspots track the cases.
+  // Size/position the hotspot stage to match the 16:9 video content. On desktop
+  // the scene is object-cover full-bleed (all five cases fit a 16:9 viewport).
+  // On a portrait phone a 16:9 scene is far wider than the screen, so the side
+  // cases fall off-screen — there we lay the full scene out at its natural width
+  // and let the user DRAG left/right to discover them (panX), keeping the video
+  // and the hotspots locked together.
   useEffect(() => {
     const R = 16 / 9;
     const fit = () => {
       const s = sectionRef.current;
       const stage = stageRef.current;
-      if (!s || !stage) return;
+      const bg = bgRef.current;
+      if (!s || !stage || !bg) return;
       const w = s.clientWidth;
       const h = s.clientHeight;
-      let cw: number;
-      let ch: number;
-      if (w / h > R) {
-        cw = w;
-        ch = w / R;
+      const isMobile = w / h < R; // portrait: scene wider than screen → pannable
+
+      if (isMobile) {
+        const ch = h;
+        const cw = h * R;
+        for (const el of [stage, bg]) {
+          el.style.width = `${cw}px`;
+          el.style.height = `${ch}px`;
+          el.style.left = "0px";
+          el.style.top = "0px";
+          el.style.right = "auto";
+          el.style.bottom = "auto";
+        }
+        panBounds.current = { min: w - cw, max: 0 };
+        if (!panInit.current) {
+          panX.current = (w - cw) / 2; // start centred on the product case
+          panInit.current = true;
+        }
+        panX.current = Math.max(panBounds.current.min, Math.min(panBounds.current.max, panX.current));
+        const t = `translateX(${panX.current}px)`;
+        stage.style.transform = t;
+        bg.style.transform = t;
       } else {
-        ch = h;
-        cw = h * R;
+        // desktop: object-cover full-bleed; restore the original centred stage
+        let cw: number;
+        let ch: number;
+        if (w / h > R) {
+          cw = w;
+          ch = w / R;
+        } else {
+          ch = h;
+          cw = h * R;
+        }
+        stage.style.width = `${cw}px`;
+        stage.style.height = `${ch}px`;
+        stage.style.left = `${(w - cw) / 2}px`;
+        stage.style.top = `${(h - ch) / 2}px`;
+        stage.style.transform = "";
+        for (const p of ["width", "height", "left", "top", "right", "bottom", "transform"] as const) {
+          bg.style[p] = "";
+        }
+        panBounds.current = { min: 0, max: 0 };
+        panInit.current = false;
       }
-      stage.style.width = `${cw}px`;
-      stage.style.height = `${ch}px`;
-      stage.style.left = `${(w - cw) / 2}px`;
-      stage.style.top = `${(h - ch) / 2}px`;
     };
     fit();
     window.addEventListener("resize", fit);
     return () => window.removeEventListener("resize", fit);
+  }, []);
+
+  // Mobile drag-to-pan: translate the scene + hotspots together. A drag that
+  // actually moves is swallowed on click so it never opens a case by accident.
+  useEffect(() => {
+    const s = sectionRef.current;
+    if (!s) return;
+    let dragging = false;
+    let startX = 0;
+    let startPan = 0;
+    let moved = 0;
+
+    const applyPan = () => {
+      const t = `translateX(${panX.current}px)`;
+      if (stageRef.current) stageRef.current.style.transform = t;
+      if (bgRef.current) bgRef.current.style.transform = t;
+    };
+    const down = (e: PointerEvent) => {
+      if (panBounds.current.min >= 0) return; // desktop / nothing to pan
+      dragging = true;
+      moved = 0;
+      startX = e.clientX;
+      startPan = panX.current;
+    };
+    const move = (e: PointerEvent) => {
+      if (!dragging) return;
+      const dx = e.clientX - startX;
+      moved = Math.max(moved, Math.abs(dx));
+      panX.current = Math.max(
+        panBounds.current.min,
+        Math.min(panBounds.current.max, startPan + dx),
+      );
+      applyPan();
+    };
+    const up = () => {
+      dragging = false;
+    };
+    const clickCapture = (e: MouseEvent) => {
+      if (moved > 8) {
+        e.stopPropagation();
+        e.preventDefault();
+        moved = 0;
+      }
+    };
+    s.addEventListener("pointerdown", down);
+    window.addEventListener("pointermove", move);
+    window.addEventListener("pointerup", up);
+    s.addEventListener("click", clickCapture, true);
+    return () => {
+      s.removeEventListener("pointerdown", down);
+      window.removeEventListener("pointermove", move);
+      window.removeEventListener("pointerup", up);
+      s.removeEventListener("click", clickCapture, true);
+    };
   }, []);
 
   const openProduct = () => {
@@ -244,7 +338,7 @@ export function Store() {
 
       {/* full-bleed cinematic scene (looping video, object-cover) — immersive.
           wrapper scales from a slight zoom to 1 on arrival ("entering" the place) */}
-      <div className={`store-bg${entered ? " is-in" : ""}`}>
+      <div ref={bgRef} className={`store-bg${entered ? " is-in" : ""}`}>
         {/* base copy (offset half a loop) — always visible underneath */}
         <video
           ref={vidBaseRef}
@@ -316,6 +410,11 @@ export function Store() {
             />
           );
         })}
+      </div>
+
+      {/* mobile-only hint that the scene can be dragged sideways */}
+      <div className="store-pan-hint" aria-hidden="true">
+        ‹ Desliza para ver más ›
       </div>
 
       {/* snow drifting in front of the scene */}
