@@ -22,6 +22,10 @@ import { wrapDelta, placement, SEED_SPREAD, SEED_OFFSET } from "@/lib/coverflow"
 
 const VIDEOS = site.videos;
 const N = VIDEOS.length;
+// release year per single (shown as a small "anécdota" on the active clip's bar)
+const RELEASE_YEAR = new Map(
+  site.releases.map((r) => [r.title, new Date(r.date).getFullYear()]),
+);
 const PREVIEW_MS = 60_000; // 1-minute taster, then send them to YouTube
 const BASE_Y = 0; // deck vertically centred (equal margin top/bottom)
 
@@ -201,7 +205,12 @@ export function VideoGallery() {
                       <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" className="shrink-0">
                         <path d="M7 5v14l11-7z" />
                       </svg>
-                      <span className="p3-titlebar-name">{v.title}</span>
+                      <span className="p3-titlebar-name">
+                        {v.title}
+                        {RELEASE_YEAR.has(v.title) && (
+                          <span className="text-cream/45"> · {RELEASE_YEAR.get(v.title)}</span>
+                        )}
+                      </span>
                       {v.duration && <span className="p3-titlebar-dur">{v.duration}</span>}
                     </span>
                   )}
