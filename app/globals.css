@@ -635,10 +635,12 @@ textarea {
   gap: 0.5rem;
   padding: 0.7rem 0.95rem;
   color: var(--color-cream);
+  /* red by default — this bar only renders on the SELECTED clip, so the red marks
+     which one you're about to play (no hover on touch) */
   background: linear-gradient(
     to top,
-    rgba(8, 10, 22, 0.82) 0%,
-    rgba(8, 10, 22, 0.55) 60%,
+    rgba(164, 22, 26, 0.9) 0%,
+    rgba(110, 13, 16, 0.5) 55%,
     rgba(8, 10, 22, 0) 100%
   );
   -webkit-backdrop-filter: blur(2px);
@@ -668,28 +670,80 @@ textarea {
   );
 }
 
-/* left / right navigation arrows (the only thing that moves the deck) */
-.p3-arrow {
+/* "videos" folder — glassy red pocket with videoclip cards peeking out the top
+   (visual header at the top of page 3; the deck below is dragged with the finger) */
+.p3-folder {
   position: absolute;
-  top: 50%;
-  z-index: 25;
-  transform: translateY(-50%);
-  display: grid;
-  place-items: center;
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  color: var(--color-cream);
-  background: rgba(8, 4, 5, 0.5);
-  border: 1px solid rgba(243, 236, 224, 0.22);
-  cursor: pointer;
-  -webkit-backdrop-filter: blur(6px);
-  backdrop-filter: blur(6px);
-  transition: background 0.2s ease, transform 0.15s ease;
+  top: 4.5%;
+  left: 50%;
+  z-index: 16;
+  width: 208px;
+  height: 158px;
+  transform: translateX(-50%);
+  pointer-events: none;
 }
-.p3-arrow:hover {
-  background: rgba(164, 22, 26, 0.7);
-  transform: translateY(-50%) scale(1.08);
+.p3-folder::before {
+  content: "";
+  position: absolute;
+  inset: -34% -24%;
+  z-index: -1;
+  background: radial-gradient(closest-side, rgba(164, 22, 26, 0.5), transparent 72%);
+  filter: blur(6px);
+}
+.p3-folder-cards {
+  position: absolute;
+  inset: 0;
+}
+.p3-folder-card {
+  position: absolute;
+  top: -4px;
+  left: 50%;
+  width: 108px;
+  height: 66px;
+  margin-left: -54px;
+  object-fit: cover;
+  border-radius: 9px;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.55);
+}
+.p3-folder-card--l {
+  transform: translateX(-36px) translateY(8px) rotate(-12deg);
+  z-index: 1;
+}
+.p3-folder-card--r {
+  transform: translateX(36px) translateY(8px) rotate(12deg);
+  z-index: 1;
+}
+.p3-folder-card--m {
+  transform: translateY(-6px);
+  z-index: 2;
+}
+.p3-folder-front {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 3;
+  height: 104px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 0.4rem;
+  padding-bottom: 14px;
+  border-radius: 16px 16px 18px 18px;
+  color: var(--color-cream);
+  background: linear-gradient(160deg, rgba(164, 22, 26, 0.46), rgba(96, 11, 14, 0.32));
+  -webkit-backdrop-filter: blur(7px);
+  backdrop-filter: blur(7px);
+  box-shadow:
+    inset 0 0 0 0.5px rgba(255, 220, 220, 0.3),
+    inset 1px 1px 0 -0.5px rgba(255, 236, 236, 0.5),
+    inset -1px -1px 0 -0.5px rgba(255, 205, 205, 0.4),
+    0 18px 42px rgba(0, 0, 0, 0.45);
+}
+.p3-folder-front span {
+  font-weight: 700;
+  font-size: 1.05rem;
+  letter-spacing: 0.01em;
 }
 
 /* "Ver en YouTube" hand-off after the 1-minute taster */

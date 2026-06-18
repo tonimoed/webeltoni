@@ -41,11 +41,13 @@ function thumb(id: string) {
 type Mode = "browse" | "playing" | "cta";
 
 export function VideoGallery() {
+  const sectionRef = useRef<HTMLElement>(null);
   const fanRef = useRef<HTMLDivElement>(null);
   const cardRefs = useRef<(HTMLButtonElement | null)[]>([]);
 
   const centerRef = useRef(0); // animated front position (eases toward `selected`)
   const reducedRef = useRef(false);
+  const draggingRef = useRef(false); // finger is dragging the deck
 
   const [selected, setSelected] = useState(0);
   const selectedRef = useRef(0);
@@ -69,11 +71,14 @@ export function VideoGallery() {
 
     let raf = 0;
     const loop = () => {
-      // shortest signed path from the current centre to the selected card
-      const target = centerRef.current + wrapDelta(selectedRef.current, centerRef.current, N);
-      const ease = reducedRef.current ? 1 : 0.18;
-      centerRef.current += (target - centerRef.current) * ease;
-      if (Math.abs(target - centerRef.current) < 0.001) centerRef.current = target;
+      // while dragging, the finger sets centerRef directly; otherwise ease toward
+      // the selected card (snap) along the shortest signed path
+      if (!draggingRef.current) {
+        const target = centerRef.current + wrapDelta(selectedRef.current, centerRef.current, N);
+        const ease = reducedRef.current ? 1 : 0.18;
+        centerRef.current += (target - centerRef.current) * ease;
+        if (Math.abs(target - centerRef.current) < 0.001) centerRef.current = target;
+      }
       const center = ((centerRef.current % N) + N) % N;
 
       const W = fanRef.current?.clientWidth ?? 1000;
@@ -135,7 +140,7 @@ export function VideoGallery() {
     [playPreview],
   );
 
-  // arrow-key navigation
+  // arrow-key navigation (a11y; the visible arrows are gone — drag with the finger)
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "ArrowLeft") step(-1);
@@ -145,15 +150,79 @@ export function VideoGallery() {
     return () => window.removeEventListener("keydown", onKey);
   }, [step]);
 
+  // drag the deck with the finger; a tap (no real movement) still plays/selects,
+  // a drag is swallowed on click so it never opens a clip by accident
+  useEffect(() => {
+    const s = sectionRef.current;
+    if (!s) return;
+    const DRAG_PX = 130; // pixels dragged per one card step
+    let startX = 0;
+    let startCenter = 0;
+    let moved = 0;
+    const down = (e: PointerEvent) => {
+      if (modeRef.current !== "browse") return;
+      draggingRef.current = true;
+      startX = e.clientX;
+      startCenter = centerRef.current;
+      moved = 0;
+    };
+    const move = (e: PointerEvent) => {
+      if (!draggingRef.current) return;
+      const dx = e.clientX - startX;
+      moved = Math.max(moved, Math.abs(dx));
+      centerRef.current = startCenter - dx / DRAG_PX;
+    };
+    const up = () => {
+      if (!draggingRef.current) return;
+      draggingRef.current = false;
+      if (moved > 8) setSelected((((Math.round(centerRef.current) % N) + N) % N)); // snap
+    };
+    const clickCapture = (e: MouseEvent) => {
+      if (moved > 8) {
+        e.stopPropagation();
+        e.preventDefault();
+        moved = 0;
+      }
+    };
+    s.addEventListener("pointerdown", down);
+    window.addEventListener("pointermove", move);
+    window.addEventListener("pointerup", up);
+    s.addEventListener("click", clickCapture, true);
+    return () => {
+      s.removeEventListener("pointerdown", down);
+      window.removeEventListener("pointermove", move);
+      window.removeEventListener("pointerup", up);
+      s.removeEventListener("click", clickCapture, true);
+    };
+  }, []);
+
   const current = VIDEOS[selected];
 
   return (
     <section
+      ref={sectionRef}
       id="videos"
+      style={{ touchAction: "pan-y" }}
       className="p3 relative flex h-[100svh] min-h-[640px] w-full items-center justify-center overflow-hidden text-cream"
     >
       <CosmosBackground />
       <h2 className="sr-only">Videoclips de EL TONI</h2>
+
+      {/* "videos" folder — a glassy red pocket with videoclip cards peeking out,
+          modelled on WEB/diseño carpeta pagina 3.png (visual header, not a title) */}
+      <div className="p3-folder" aria-hidden="true">
+        <div className="p3-folder-cards">
+          {/* eslint-disable @next/next/no-img-element */}
+          <img className="p3-folder-card p3-folder-card--l" src={thumb(VIDEOS[1]?.id)} alt="" />
+          <img className="p3-folder-card p3-folder-card--r" src={thumb(VIDEOS[2]?.id)} alt="" />
+          <img className="p3-folder-card p3-folder-card--m" src={thumb(VIDEOS[0]?.id)} alt="" />
+          {/* eslint-enable @next/next/no-img-element */}
+        </div>
+        <div className="p3-folder-front">
+          <BrandIcon name="youtube" className="h-[18px] w-[18px] text-[#FF2A2A]" />
+          <span>videos</span>
+        </div>
+      </div>
 
       {/* static coverflow deck */}
       <div ref={fanRef} className="p2-fan absolute inset-0 z-10">
@@ -219,18 +288,6 @@ export function VideoGallery() {
           );
         })}
       </div>
-
-      {/* prev / next — the ONLY way the deck moves */}
-      <button onClick={() => step(-1)} aria-label="Vídeo anterior" className="p3-arrow left-3 sm:left-6">
-        <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" strokeWidth="2.2">
-          <path d="M15 5l-7 7 7 7" strokeLinecap="round" strokeLinejoin="round" />
-        </svg>
-      </button>
-      <button onClick={() => step(1)} aria-label="Vídeo siguiente" className="p3-arrow right-3 sm:right-6">
-        <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" strokeWidth="2.2">
-          <path d="M9 5l7 7-7 7" strokeLinecap="round" strokeLinejoin="round" />
-        </svg>
-      </button>
 
       {/* after the 1-minute taster → hand off to YouTube */}
       {mode === "cta" && (
