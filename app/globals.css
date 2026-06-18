@@ -670,23 +670,6 @@ textarea {
   );
 }
 
-/* "videos" folder — generated visual header (public/assets/photos/videos-folder.webp).
-   Its near-black background blends into the cosmic top of page 3. */
-.p3-folder-img {
-  position: absolute;
-  top: 3%;
-  left: 50%;
-  z-index: 16;
-  width: clamp(146px, 44vw, 208px);
-  height: auto;
-  transform: translateX(-50%);
-  pointer-events: none;
-  user-select: none;
-  /* edges are feathered to transparent in the asset itself, so it floats with no
-     visible square; this just adds a touch of depth */
-  filter: drop-shadow(0 16px 30px rgba(0, 0, 0, 0.45));
-}
-
 /* "Ver en YouTube" hand-off after the 1-minute taster */
 .p3-cta {
   position: absolute;

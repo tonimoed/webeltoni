@@ -208,16 +208,6 @@ export function VideoGallery() {
       <CosmosBackground />
       <h2 className="sr-only">Videoclips de EL TONI</h2>
 
-      {/* "videos" folder — generated visual header (glassy red pocket with the
-          artist's videoclip cards + "videos"), modelled on the reference design */}
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src="/assets/photos/videos-folder.webp"
-        alt="Videoclips de EL TONI"
-        className="p3-folder-img"
-        draggable={false}
-      />
-
       {/* static coverflow deck */}
       <div ref={fanRef} className="p2-fan absolute inset-0 z-10">
         {VIDEOS.map((v, i) => {
