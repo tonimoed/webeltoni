@@ -208,21 +208,15 @@ export function VideoGallery() {
       <CosmosBackground />
       <h2 className="sr-only">Videoclips de EL TONI</h2>
 
-      {/* "videos" folder — a glassy red pocket with videoclip cards peeking out,
-          modelled on WEB/diseño carpeta pagina 3.png (visual header, not a title) */}
-      <div className="p3-folder" aria-hidden="true">
-        <div className="p3-folder-cards">
-          {/* eslint-disable @next/next/no-img-element */}
-          <img className="p3-folder-card p3-folder-card--l" src={thumb(VIDEOS[1]?.id)} alt="" />
-          <img className="p3-folder-card p3-folder-card--r" src={thumb(VIDEOS[2]?.id)} alt="" />
-          <img className="p3-folder-card p3-folder-card--m" src={thumb(VIDEOS[0]?.id)} alt="" />
-          {/* eslint-enable @next/next/no-img-element */}
-        </div>
-        <div className="p3-folder-front">
-          <BrandIcon name="youtube" className="h-[18px] w-[18px] text-[#FF2A2A]" />
-          <span>videos</span>
-        </div>
-      </div>
+      {/* "videos" folder — generated visual header (glassy red pocket with the
+          artist's videoclip cards + "videos"), modelled on the reference design */}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src="/assets/photos/videos-folder.webp"
+        alt="Videoclips de EL TONI"
+        className="p3-folder-img"
+        draggable={false}
+      />
 
       {/* static coverflow deck */}
       <div ref={fanRef} className="p2-fan absolute inset-0 z-10">
