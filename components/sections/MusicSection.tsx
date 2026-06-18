@@ -7,8 +7,6 @@ import { BrandIcon } from "@/components/ui/BrandIcons";
 import { Waveform } from "@/components/ui/Waveform";
 import DynamicWaveBackground from "@/components/ui/dynamic-wave-canvas-background";
 import { wrapDelta, placement, SEED_SPREAD, SEED_OFFSET } from "@/lib/coverflow";
-import { saveToSpotify } from "@/lib/spotify-save";
-import { track } from "@/lib/analytics";
 
 /**
  * Second page (#escuchar) — the artist (FOTO PERFIL) anchors a full-bleed
@@ -52,8 +50,6 @@ export function MusicSection() {
   // The player shows the latest single (index 0) from the start, paused.
   const [selected, setSelected] = useState<number>(0);
   const [playing, setPlaying] = useState(false);
-  const [toast, setToast] = useState<string | null>(null);
-  const toastTimer = useRef<number | undefined>(undefined);
 
   /* ---- coverflow drift / snap loop (writes transforms directly) -------- */
   useEffect(() => {
@@ -152,22 +148,6 @@ export function MusicSection() {
   );
 
   const current = SINGLES[selected];
-
-  const showToast = useCallback((m: string) => {
-    setToast(m);
-    if (toastTimer.current) clearTimeout(toastTimer.current);
-    toastTimer.current = window.setTimeout(() => setToast(null), 2400);
-  }, []);
-
-  // One-click "save to Spotify library" (OAuth PKCE; redirects on first use,
-  // then saves instantly while the session token is valid).
-  const onSaveSpotify = useCallback(async () => {
-    track("listen_click", { platform: "spotify", track: current.title });
-    const res = await saveToSpotify(current.spotify, "/#escuchar");
-    if (res === "saved") showToast(`«${current.title}» guardada en tu Spotify ✓`);
-    else if (res === "error") showToast("No se pudo guardar. Inténtalo de nuevo.");
-    // "redirecting" / "opened" navigate away — no toast needed
-  }, [current, showToast]);
 
   return (
     <section
@@ -285,16 +265,16 @@ export function MusicSection() {
             Side by side (half/half) on every breakpoint so each is a big tap target;
             the "Añadir a" prefix is hidden on mobile so the short label fits. */}
         <div className="pointer-events-auto flex w-[min(94vw,560px)] flex-row gap-2.5 sm:gap-3">
-          <button
-            type="button"
-            onClick={onSaveSpotify}
+          <a
+            href={current.spotify}
+            target="_blank"
+            rel="noopener noreferrer"
             className="p2-save flex-1"
-            aria-label={`Guardar ${current.title} en tu biblioteca de Spotify`}
           >
             <BrandIcon name="spotify" className="h-7 w-7 shrink-0 sm:h-[18px] sm:w-[18px]" />
             <span className="hidden sm:inline">Añadir a&nbsp;</span>Spotify
             <span className="p2-shine" aria-hidden="true" />
-          </button>
+          </a>
           <a
             href={current.appleMusic}
             target="_blank"
@@ -308,11 +288,6 @@ export function MusicSection() {
         </div>
       </div>
 
-      {toast && (
-        <div className="store-toast" role="status">
-          {toast}
-        </div>
-      )}
     </section>
   );
 }
